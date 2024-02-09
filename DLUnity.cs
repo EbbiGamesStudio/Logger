@@ -218,4 +218,20 @@ public static partial class DL
 		if (ShowExceptionInUnity)
 			UnityEngine.Debug.LogException(exception);
 	}
+
+	public static void LogStackTrace(bool isDiagnosticStackTrace=false)
+	{
+		// Jeśli debugowanie jest wyłączone, zakończ działanie metody
+		if (!isActive)
+			return;
+
+		// Jeśli zapisywanie logów do pliku jest włączone, zapisz log
+		if (SaveLogToFile)
+		{
+            if (isDiagnosticStackTrace)
+				Logger(LoggerType.Log, "", new System.Diagnostics.StackTrace().ToString());
+			else
+				Logger(LoggerType.Log, "", System.Environment.StackTrace);
+		}
+	}
 }
