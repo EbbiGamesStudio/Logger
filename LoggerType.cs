@@ -12,4 +12,17 @@
 		Exception = 4,  // Log wyjątku
 		StackTrace = 5, // Log śladu stosu
 	}
+
+
+
+	/*   LogType Unity
+	public enum LogType
+	{
+		Error,
+		Assert,
+		Warning,
+		Log,
+		Exception
+	}
+	 */
 }

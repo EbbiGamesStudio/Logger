@@ -1,18 +1,77 @@
 ﻿using System;
+using System.Collections.Generic;
+
+using UnityEngine;
 
 public static partial class DL
 {
-	private static string GetCurrentTime() =>
-		string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D3}",
-		DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second, DateTime.Now.Millisecond);
+	public struct DateTimeFormat
+	{
+		/// <summary>
+		/// Format daty i czasu w formacie: 2020-01-01 12:00:00.000
+		/// </summary>
+		public const string Full = "yyyy-MM-dd HH.mm.ss.fff";
+		/// <summary>
+		/// Format daty i czasu w formacie: 2020-01-01 12:00:00
+		/// </summary>
+		public const string Long = "yyyy-MM-dd HH:mm:ss";
+		/// <summary>
+		/// Format daty i czasu w formacie: 2020-01-01
+		/// </summary>
+		public const string Short = "yyyy-MM-dd";
+		/// <summary>
+		/// Format daty i czasu w formacie: 12:00:00.000
+		/// </summary>
+		public const string Time = "HH:mm:ss.fff";
+		/// <summary>
+		/// Format daty i czasu w formacie: 12:00:00
+		/// </summary>
+		public const string TimeShort = "HH:mm:ss";
+	}
 
-	private static string GetCurrentTimeAndDate() =>
-		string.Format("{0:D4}-{1:D2}-{2:D2} {3:D2}:{4:D2}:{5:D2}.{6:D3}",
-		DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,
-		DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second, DateTime.Now.Millisecond);
 
-	private static string GetCurrentTimeForFilename() =>
-		string.Format("{0:D4}-{1:D2}-{2:D2} {3:D2}.{4:D2}.{5:D2}",
-		DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,
-		DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second, DateTime.Now.Millisecond);
+
+	public const string Version = "v1.0";
+	public const string FullNameApplication = "Debuger (DL) " + Version;
+	private const string separator = "==================================================================================================================";
+	private static List<string> logList;
+
+	private static string GetCurrentTime() => DateTime.Now.ToString(DateTimeFormat.Time);
+	private static string GetCurrentTimeForFilename() => DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss.fff");
+
+
+	// Czy debuger jest aktywny, jest to możliwość całkowitego wyłączenia debugera.
+	private static bool isActive = true;
+	private static string filePath = "";
+
+	public static DLSettings Settings;
+
+	public const int LogEntryTimeLength = 12;
+	public const int LogEntryTypeLength = 9;
+	public const int LogEntryTitleLength = 30;
+	public const int LogEntrySeparatorLength = 3;
+	public const int LogEntryLeftMargin = LogEntryTimeLength + LogEntryTypeLength + LogEntryTitleLength + (LogEntrySeparatorLength * 2);
+
+	private static int bufferIndex = 0;
+
+	private static Colors defaultColor = Colors.white;
+
+	/// <summary>
+	/// Zmienna, która przechowuje informację o tym, czy debuger jest aktywny
+	/// Kiedy debuger jest wyłączony, wszystkie metody debugowania są przerywane.
+	/// </summary>
+	public static bool Enabled
+	{
+		get => isActive;
+		set => isActive = value;
+	}
+
+	/// <summary>
+	/// Ustawia ilość plików logów
+	/// </summary>
+	public static void SetFilesCount(int count)
+	{
+		Settings.File_MaximumFilesCount = count;
+	}
+
 }

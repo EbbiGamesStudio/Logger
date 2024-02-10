@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="DL.cs" />
     <Compile Include="DLDatesAndTimes.cs" />
+    <Compile Include="DLSettings.cs" />
     <Compile Include="DLStringFormats.cs" />
     <Compile Include="DLUnity.cs" />
     <Compile Include="LoggerType.cs" />
