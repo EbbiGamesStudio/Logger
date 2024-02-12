@@ -54,7 +54,12 @@ public static partial class DL
 
 	private static int bufferIndex = 0;
 
-	private static Colors defaultColor = Colors.white;
+	private static string lineColor = Colors.Gray;
+	private static string argColor = Colors.Cyan;
+	private static string defaultColor = Colors.White;
+	private static string infoColor = Colors.Lime;
+	private static string warningColor = Colors.Yellow;
+	private static string errorColor = Colors.Red;
 
 	/// <summary>
 	/// Zmienna, która przechowuje informację o tym, czy debuger jest aktywny

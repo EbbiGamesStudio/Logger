@@ -1,32 +1,55 @@
 ﻿public static partial class DL
 {
-	/// <summary>
-	/// Metoda rozszerzająca, która zwraca ciąg znaków w kolorze określonym przez parametr color
-	/// </summary>
-	private static string Colored(this string source, Colors color) => string.Format("<color={0}>{1}</color>", color.ToString(), source);
-	/// <summary>
-	/// Metoda rozszerzająca, która zwraca ciąg znaków w kolorze określonym przez parametr colorCode
-	/// </summary>
-	private static string Colored(this string source, string colorCode) => string.Format("<color={0}>{1}</color>", colorCode, source);
-	/// <summary>
-	/// Metoda rozszerzająca, która zwraca ciąg znaków w rozmiarze określonym przez parametr size
-	/// </summary>
-	private static string Sized(this string source, int size) => string.Format("<size={0}>{1}</size>", size, source);
-	/// <summary>
-	/// Metoda rozszerzająca, która zwraca ciąg znaków wytłuszczony
-	/// </summary>
-	private static string Bold(this string source) => string.Format("<b>{0}</b>", source);
-	/// <summary>
-	/// Metoda rozszerzająca, która zwraca ciąg znaków pochylony
-	/// </summary>
-	private static string Italics(this string source) => string.Format("<i>{0}</i>", source);
+	private static string Colored(this string source, string colorCode)
+	{
+		return $"<color={colorCode}>{source}</color>";
+	}
+	private static string[] Colored(this string[] source, string colorCode)
+	{
+		string[] temp = new string[source.Length];
+		for (int i = 0; i < source.Length; i++)
+			temp[i] = source[i].Colored(colorCode);
+		return temp;
+	}
 
-	/// <summary>
-	/// Metoda rozszerzająca, która ustawia długość ciągu znaków
-	/// </summary>
-	/// <param name="source">tekst do edycji</param>
-	/// <param name="length">ilość wymaganych znaków</param>
-	/// <returns></returns>
+	private static string Sized(this string source, int size)
+	{
+		return string.Format("<size={0}>{1}</size>", size, source);
+	}
+	private static string[] Sized(this string[] source, int size)
+	{
+		string[] temp = new string[source.Length];
+		for (int i = 0; i < source.Length; i++)
+			temp[i] = source[i].Sized(size);
+		return temp;
+	}
+
+	private static string Bold(this string source)
+	{
+		return string.Format("<b>{0}</b>", source);
+	}
+
+	private static string[] Bold(this string[] source)
+	{
+		string[] temp = new string[source.Length];
+		for (int i = 0; i < source.Length; i++)
+			temp[i] = source[i].Bold();
+		return temp;
+	}
+
+	private static string Italics(this string source)
+	{
+		return string.Format("<i>{0}</i>", source);
+	}
+
+	private static string[] Italics(this string[] source)
+	{
+		string[] temp = new string[source.Length];
+		for (int i = 0; i < source.Length; i++)
+			temp[i] = source[i].Italics();
+		return temp;
+	}
+
 	private static string SetLength(this string source, int length)
 	{
 		// Zmienna tymczasowa, która przechowuje źródłowy ciąg znaków
@@ -46,29 +69,31 @@
 			return temp_s;
 		}
 	}
-
-	public enum Colors
+	private static string[] SetLength(this string[] source, int length)
 	{
-		aqua,
-		black,
-		blue,
-		brown,
-		cyan,
-		darkblue,
-		fuchsia,
-		green,
-		grey,
-		lightblue,
-		lime,
-		magenta,
-		maroon,
-		navy,
-		olive,
-		purple,
-		red,
-		silver,
-		teal,
-		white,
-		yellow
+		string[] temp = new string[source.Length];
+		for (int i = 0; i < source.Length; i++)
+			temp[i] = source[i].SetLength(length);
+		return temp;
+	}
+
+	public struct Colors
+	{
+		public const string Red = "#ff0000ff";
+		public const string Yellow = "#ffff00ff";
+		public const string Green = "#008000ff";
+		public const string Cyan = "#00ffffff";
+		public const string White = "#ffffffff";
+		public const string Black = "#000000ff";
+		public const string Magenta = "magenta";
+		public const string Blue = "#0000ffff";
+		public const string Gray = "#808080ff";
+		public const string Silver = "#c0c0c0ff";
+		public const string Maroon = "#800000ff";
+		public const string Olive = "#808000ff";
+		public const string Purple = "#800080ff";
+		public const string Teal = "#008080ff";
+		public const string Navy = "#000080ff";
+		public const string Lime = "#00ff00ff";
 	}
 }

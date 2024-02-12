@@ -11,6 +11,8 @@
 		Log = 3,        // Log zwykły
 		Exception = 4,  // Log wyjątku
 		StackTrace = 5, // Log śladu stosu
+		Line = 6,       // Log linii
+		Separator = 7,  // Log separatora
 	}
 
 

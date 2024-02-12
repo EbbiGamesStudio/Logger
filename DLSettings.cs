@@ -25,9 +25,6 @@
 		public bool Line_ShowInUnity { get; set; }
 		public bool Line_SaveToFile { get; set; }
 		public bool Line_SendToServer { get; set; }
-		public bool Line_StackTrace_ShowInUnity { get; set; }
-		public bool Line_StackTrace_SaveToFile { get; set; }
-		public bool Line_StackTrace_SendToServer { get; set; }
 
 		// Ustawienia Log
 		public bool Log_ShowInUnity { get; set; }

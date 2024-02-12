@@ -22,7 +22,7 @@ public static partial class DL
 
 
 	/// <summary>
-	/// Statyczna metoda, która obsługuje zdarzenie otrzymania loga z Unity
+	/// Statyczna metoda, która obsługuje zdarzenie otrzymane z Unity
 	/// </summary>
 	private static async void Application_logMessageReceived(string condition, string stackTrace, LogType type)
 	{
@@ -30,6 +30,7 @@ public static partial class DL
 		if (!isActive)
 			return;
 
+		// Jeśli włączone jest buforowanie logów, uruchomiony zostanie zapis do pliku wielowątkowy
 		if (Settings.IsBuffered)
 		{
 			if (bufferIndex >= Settings.BufferSize)
@@ -48,7 +49,7 @@ public static partial class DL
 
 
 		// Jeśli wysyłąnie do serwera jest włączone to wyślij log
-
+		//todo server
 	}
 
 
@@ -132,25 +133,53 @@ public static partial class DL
 				+ line)    // Dodaj wcięcie do każdej linii
 			.ToArray();
 
-		stack = string.Join("\n", stackLines)
-				+ "\n" + new string(' ', LogEntryLeftMargin)
-				+ sep;
-
+		//stack = string.Join("\n", stackLines)
+		//		+ "\n" + new string(' ', LogEntryLeftMargin)
+		//		+ sep;
+		stack = string.Join("\n", stackLines);
+		
 		logList.Add(stack);
 
 	}
 
 	private static void SendLogEntryFromDirectToFile(string titleLogEntry, string messageLogEntry, LoggerType logType, string stackTrace = "")
 	{
+		//todo obróbkę stacktrace zrobić przy zapisie do pliku.
+		// do tego pomyśleć o buforze i zapisie do pliku w tle bądź co jakiś czas.
 		const string sep = " | ";
 		string logTitle;
 
-		if (string.IsNullOrEmpty(titleLogEntry))
+		if (logType == LoggerType.Separator)
 		{
-			logTitle = new string(' ', LogEntryLeftMargin) + sep + messageLogEntry;
+			CheckBufferSaveFile();
+			logTitle = separator;
+			logList.Add(logTitle);
+			return;
+		} else if (logType == LoggerType.Line)
+		{
+			// Ustawienie tytułu loga
+			// Format: [                       | Unity Runtine | Log message]
+			if (titleLogEntry == "")
+			{
+				logTitle = string.Concat(
+					"".SetLength(LogEntryLeftMargin),
+					sep,
+					messageLogEntry);
+			}
+			else
+			{
+				logTitle = string.Concat(
+									"".SetLength(LogEntryTimeLength),
+									"".SetLength(LogEntrySeparatorLength),
+									"".SetLength(LogEntryTypeLength),
+									sep,
+									titleLogEntry.SetLength(LogEntryTitleLength),
+									sep,
+									messageLogEntry);
+			}
 		}
-        else
-        {
+		else
+		{
 			// Ustawienie tytułu loga
 			// Format: [12:00:00.000 | LogType | Unity Runtine | Log message]
 			logTitle = string.Concat(
@@ -161,9 +190,7 @@ public static partial class DL
 								titleLogEntry.SetLength(LogEntryTitleLength),
 								sep,
 								messageLogEntry);
-		}
-
-        
+		}        
 
 		CheckBufferSaveFile();
 
@@ -174,13 +201,16 @@ public static partial class DL
 		if (string.IsNullOrEmpty(stackTrace))
 			return;
 
+		logList.Add(FormatStackTrace(stackTrace));
+	}
+
+	private static string FormatStackTrace(string stackTrace)
+	{
 		// Sformatuj ślad stosu
 		string stack = $"{stackTrace}";
 
 		// stwórz tablicę linii ze śladu stosu
 		string[] stackLines = stack.Split('\n');
-
-
 
 		stackLines = stackLines
 			.Where(line => !string.IsNullOrWhiteSpace(line)                      // Usuń puste linie ze śladu stosu
@@ -206,25 +236,68 @@ public static partial class DL
 
 				// Sformatuj linię
 				stackLines[i] = classAndMethod + "\n"
-					+ new string(' ', LogEntryLeftMargin) + sep
-					+ "".SetLength(Settings.MarginForStackTraceInFile)
-					+ filePathAndLine + "\n"
-					+ new string(' ', LogEntryLeftMargin) + sep;
+							    + new string(' ', LogEntryLeftMargin) + " | "
+								+ "".SetLength(Settings.MarginForStackTraceInFile)
+								+ filePathAndLine + "\n"
+								+ new string(' ', LogEntryLeftMargin) + " | ";
 			}
 		}
 
 		stackLines = stackLines.Select(line =>
-				new string(' ', LogEntryLeftMargin)
-				+ sep
-				+ "".SetLength(Settings.MarginForStackTraceInFile)
-				+ line)    // Dodaj wcięcie do każdej linii
-			.ToArray();
+						new string(' ', LogEntryLeftMargin)
+						+ " | "
+						+ "".SetLength(Settings.MarginForStackTraceInFile)
+						+ line)    // Dodaj wcięcie do każdej linii
+						.ToArray();
 
-		stack = string.Join("\n", stackLines)
-				+ "\n" + new string(' ', LogEntryLeftMargin)
-				+ sep;
+		stack = string.Join("\n", stackLines);
+		return stack;
+	}
 
-		logList.Add(stack);
+	private static string FormatStackTraceForUnity(string stackTrace)
+	{
+		// Sformatuj ślad stosu
+		string stack = $"{stackTrace}";
+
+		// stwórz tablicę linii ze śladu stosu
+		string[] stackLines = stack.Split('\n');
+
+		stackLines = stackLines
+			.Where(line => !string.IsNullOrWhiteSpace(line)                      // Usuń puste linie ze śladu stosu
+						&& !line.StartsWith("UnityEngine.Debug:")                // Usuń linie z Unity
+						&& !line.StartsWith("UnityEngine.StackTraceUtility:")    // Usuń linie z Unity
+						&& !line.StartsWith("UnityEditor")                       // Usuń linie z Unity Editor
+						&& !line.StartsWith("DL")).ToArray();                    // Usuń linie z debugera
+
+		for (int i = 0; i < stackLines.Length; i++)
+		{
+			string[] parts = stackLines[i].Split(new string[] { " (at " }, StringSplitOptions.None);
+			if (parts.Length == 2)
+			{
+				// Pierwsza część zawiera nazwę klasy i metodę
+				string classAndMethod = parts[0];
+
+				// Druga część zawiera ścieżkę pliku i numer linii
+				string filePathAndLine = parts[1];
+
+				// Usuń zbędne nawiasy i nawiasy kwadratowe
+				// classAndMethod = classAndMethod.Replace(" ()", "");
+				filePathAndLine = filePathAndLine.Replace(")", "").Replace("]", "");
+
+				// Sformatuj linię
+				stackLines[i] = classAndMethod + "\n"
+								+ "".SetLength(Settings.MarginForStackTraceInFile)
+								+ filePathAndLine + "\n";
+			}
+		}
+
+		stackLines = stackLines.Select(line =>
+						"".SetLength(Settings.MarginForStackTraceInFile)
+						+ line)    // Dodaj wcięcie do każdej linii
+						.ToArray();
+
+		stack = string.Join("\n", stackLines);
+		return stack;
 	}
 
 	/// <summary>
