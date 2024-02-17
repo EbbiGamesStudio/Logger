@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -82,6 +84,7 @@ public static partial class DL
 
 		// Dodaj log do listy
 		logList.Add(logTitle);
+		Task.Run(() => SendToServer(logTitle));
 
 		// Jeśli zapisywanie śladu stosu do pliku jest włączone, zapisz ślad stosu
 		if (!Settings.FromUnity_StackTrace_Enabled)
@@ -137,8 +140,9 @@ public static partial class DL
 		//		+ "\n" + new string(' ', LogEntryLeftMargin)
 		//		+ sep;
 		stack = string.Join("\n", stackLines);
-		
+
 		logList.Add(stack);
+		Task.Run(() => SendToServer(stack));
 
 	}
 
@@ -154,8 +158,10 @@ public static partial class DL
 			CheckBufferSaveFile();
 			logTitle = separator;
 			logList.Add(logTitle);
+			Task.Run(()=> SendToServer(logTitle));
 			return;
-		} else if (logType == LoggerType.Line)
+		}
+		else if (logType == LoggerType.Line)
 		{
 			// Ustawienie tytułu loga
 			// Format: [                       | Unity Runtine | Log message]
@@ -190,18 +196,20 @@ public static partial class DL
 								titleLogEntry.SetLength(LogEntryTitleLength),
 								sep,
 								messageLogEntry);
-		}        
+		}
 
 		CheckBufferSaveFile();
 
 		// Dodaj log do listy
 		logList.Add(logTitle);
+		Task.Run(() => SendToServer(logTitle));
 
 		// Jeśli nie ma śladu stosu, zakończ działanie metody
 		if (string.IsNullOrEmpty(stackTrace))
 			return;
 
 		logList.Add(FormatStackTrace(stackTrace));
+		Task.Run(()=> SendToServer(FormatStackTrace(stackTrace)));
 	}
 
 	private static string FormatStackTrace(string stackTrace)
@@ -236,7 +244,7 @@ public static partial class DL
 
 				// Sformatuj linię
 				stackLines[i] = classAndMethod + "\n"
-							    + new string(' ', LogEntryLeftMargin) + " | "
+								+ new string(' ', LogEntryLeftMargin) + " | "
 								+ "".SetLength(Settings.MarginForStackTraceInFile)
 								+ filePathAndLine + "\n"
 								+ new string(' ', LogEntryLeftMargin) + " | ";
@@ -410,5 +418,27 @@ public static partial class DL
 			file.Delete();
 		}
 	}
+
+	public static async Task SendToServer(string message)
+	{
+		try
+		{
+			// Utwórz obiekt TcpClient i połącz się z programem nasłuchującym
+			using (TcpClient client = new TcpClient("127.0.0.1", 13000))
+			{
+				// Przygotuj dane logu do wysłania
+				byte[] data = Encoding.UTF8.GetBytes(message);
+
+				// Pobierz strumień sieciowy i wyślij dane logu
+				NetworkStream stream = client.GetStream();
+				await stream.WriteAsync(data, 0, data.Length);
+			}
+		}
+		catch (System.Exception e)
+		{
+			Debug.LogError("Error sending log: " + e.Message);
+		}
+	}
+
 
 }
