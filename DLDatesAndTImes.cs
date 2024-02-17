@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 
 using UnityEngine;
 
@@ -29,7 +30,7 @@ public static partial class DL
 		public const string TimeShort = "HH:mm:ss";
 	}
 
-
+	private static Timer timer;
 
 	public const string Version = "v1.0";
 	public const string FullNameApplication = "Debuger (DL) " + Version;

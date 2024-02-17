@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 using UnityEngine;
 
@@ -20,27 +19,17 @@ public static partial class DL
 		Application.logMessageReceived += Application_logMessageReceived;
 		Application.quitting += Application_quitting;
 		logList = new List<string>();
+		timer = new System.Threading.Timer((e) => SaveToFile(), null, 0, 5000);
 	}
-
 
 	/// <summary>
 	/// Statyczna metoda, która obsługuje zdarzenie otrzymane z Unity
 	/// </summary>
-	private static async void Application_logMessageReceived(string condition, string stackTrace, LogType type)
+	private static void Application_logMessageReceived(string condition, string stackTrace, LogType type)
 	{
 		// Jeśli debugowanie jest wyłączone, zakończ działanie metody
 		if (!isActive)
 			return;
-
-		// Jeśli włączone jest buforowanie logów, uruchomiony zostanie zapis do pliku wielowątkowy
-		if (Settings.IsBuffered)
-		{
-			if (bufferIndex >= Settings.BufferSize)
-			{
-				await SaveToFileAsync();
-				bufferIndex = 0;
-			}
-		}
 
 		// Jeśli zapisywanie logów do pliku jest włączone, zapisz log do listy
 		if (Settings.SaveToFileEnabled)
@@ -48,18 +37,19 @@ public static partial class DL
 			// Sformatuj wpis do listy
 			SendLogEntryFromUnityToFile(condition, stackTrace, type);
 		}
-
-
-		// Jeśli wysyłąnie do serwera jest włączone to wyślij log
-		//todo server
 	}
-
 
 	private static void Application_quitting()
 	{
 		// Jeśli zapisywanie logów do pliku jest włączone, zapisz log
 		if (Settings.SaveToFileEnabled)
 			SaveToFile();
+
+		// Zatrzymaj timer przy zniszczeniu obiektu
+		if (timer != null)
+		{
+			timer.Dispose();
+		}
 	}
 
 	private static void SendLogEntryFromUnityToFile(string condition, string stackTrace, LogType type)
@@ -83,8 +73,7 @@ public static partial class DL
 							condition);
 
 		// Dodaj log do listy
-		logList.Add(logTitle);
-		Task.Run(() => SendToServer(logTitle));
+		AddToFileQueue(logTitle);
 
 		// Jeśli zapisywanie śladu stosu do pliku jest włączone, zapisz ślad stosu
 		if (!Settings.FromUnity_StackTrace_Enabled)
@@ -141,8 +130,7 @@ public static partial class DL
 		//		+ sep;
 		stack = string.Join("\n", stackLines);
 
-		logList.Add(stack);
-		Task.Run(() => SendToServer(stack));
+		AddToFileQueue(stack);
 
 	}
 
@@ -155,10 +143,8 @@ public static partial class DL
 
 		if (logType == LoggerType.Separator)
 		{
-			CheckBufferSaveFile();
 			logTitle = separator;
-			logList.Add(logTitle);
-			Task.Run(()=> SendToServer(logTitle));
+			AddToFileQueue(logTitle);
 			return;
 		}
 		else if (logType == LoggerType.Line)
@@ -198,18 +184,14 @@ public static partial class DL
 								messageLogEntry);
 		}
 
-		CheckBufferSaveFile();
-
 		// Dodaj log do listy
-		logList.Add(logTitle);
-		Task.Run(() => SendToServer(logTitle));
+		AddToFileQueue(logTitle);
 
 		// Jeśli nie ma śladu stosu, zakończ działanie metody
 		if (string.IsNullOrEmpty(stackTrace))
 			return;
 
-		logList.Add(FormatStackTrace(stackTrace));
-		Task.Run(()=> SendToServer(FormatStackTrace(stackTrace)));
+		AddToFileQueue(FormatStackTrace(stackTrace));
 	}
 
 	private static string FormatStackTrace(string stackTrace)
@@ -338,16 +320,13 @@ public static partial class DL
 			return;
 
 		logList.Clear();
-
-		// Jeśli wysyłanie do serwera jest włączone to wyślij log specjalny do wyczyszczenia logów.
-		//todo Server.SendLogToServer("Clear logs");
 	}
 
 	/// <summary>
 	/// Metoda zapisjuąca do pliku logi z listy stosująca strumieniowanie
 	/// z możliwością zapisu do pliku w trakcie działania aplikacji
 	/// </summary>
-	public static void SaveToFile()
+	private static void SaveToFile()
 	{
 		// Sprawdzenie, czy lista logów jest pusta
 		// Jeśli tak, zakończ działanie metody
@@ -356,9 +335,10 @@ public static partial class DL
 
 		File.AppendAllLines(filePath, logList);
 		logList.Clear();
+		bufferIndex = 0;
 	}
 
-	public static void CheckBufferSaveFile()
+	private static void CheckBufferSaveFile()
 	{
 		if (logList.Count == 0)
 			return;
@@ -370,25 +350,9 @@ public static partial class DL
 		}
 	}
 
-	public static void StreamToFile(string log)
+	private static void StreamToFile(string log)
 	{
 		File.AppendAllLines(filePath, logList);
-	}
-
-	public static async Task SaveToFileAsync()
-	{
-		if (logList.Count == 0)
-			return;
-
-		using (StreamWriter streamWriter = File.AppendText(filePath))
-		{
-			foreach (var log in logList)
-			{
-				await streamWriter.WriteLineAsync(log);
-			}
-		}
-
-		logList.Clear();
 	}
 
 	/// <summary>
@@ -419,26 +383,10 @@ public static partial class DL
 		}
 	}
 
-	public static async Task SendToServer(string message)
+	private static void AddToFileQueue(string log)
 	{
-		try
-		{
-			// Utwórz obiekt TcpClient i połącz się z programem nasłuchującym
-			using (TcpClient client = new TcpClient("127.0.0.1", 13000))
-			{
-				// Przygotuj dane logu do wysłania
-				byte[] data = Encoding.UTF8.GetBytes(message);
-
-				// Pobierz strumień sieciowy i wyślij dane logu
-				NetworkStream stream = client.GetStream();
-				await stream.WriteAsync(data, 0, data.Length);
-			}
-		}
-		catch (System.Exception e)
-		{
-			Debug.LogError("Error sending log: " + e.Message);
-		}
+		logList.Add(log);
+		bufferIndex++;
+		CheckBufferSaveFile();
 	}
-
-
 }

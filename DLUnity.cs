@@ -40,8 +40,6 @@ public static partial class DL
 
 		if (!Debug.isDebugBuild) return;
 
-		//todo Server
-
 		if (!Settings.ShowInUnity) return;
 		if (!Settings.Line_ShowInUnity) return;
 
@@ -64,8 +62,6 @@ public static partial class DL
 		if (Settings.SaveToFileEnabled) SendLogEntryFromDirectToFile("", message.ToString(), LoggerType.Line);
 
 		if (!Debug.isDebugBuild) return;
-
-		//todo Server
 
 		if (!Settings.ShowInUnity) return;
 		if (!Settings.Line_ShowInUnity) return;
@@ -91,8 +87,6 @@ public static partial class DL
 		}
 
 		if (!Debug.isDebugBuild) return;
-
-		//todo Server
 
 		if (!Settings.ShowInUnity) return;
 		if (!Settings.Log_ShowInUnity) return;
@@ -131,8 +125,6 @@ public static partial class DL
 
 		if (!Debug.isDebugBuild) return;
 
-		//todo Server
-
 		if (!Settings.ShowInUnity) return;
 		if (!Settings.Log_ShowInUnity) return;
 
@@ -163,8 +155,6 @@ public static partial class DL
 		}
 
 		if (!Debug.isDebugBuild) return;
-
-		//todo Server
 
 		if (!Settings.ShowInUnity) return;
 		if (!Settings.Log_ShowInUnity) return;
@@ -200,8 +190,6 @@ public static partial class DL
 
 		if (!Debug.isDebugBuild) return;
 
-		//todo Server
-
 		if (!Settings.ShowInUnity) return;
 		if (!Settings.Log_ShowInUnity) return;
 
@@ -231,8 +219,6 @@ public static partial class DL
 
 		if (!Debug.isDebugBuild) return;
 
-		//todo Server
-
 		if (!Settings.ShowInUnity) return;
 
 		string result = message.ToString();
@@ -255,8 +241,6 @@ public static partial class DL
 		}
 
 		if (!Debug.isDebugBuild) return;
-
-		//todo Server
 
 		if (!Settings.ShowInUnity) return;
 
@@ -281,8 +265,6 @@ public static partial class DL
 		}
 
 		if (!Debug.isDebugBuild) return;
-
-		//todo Server
 
 		if (!Settings.ShowInUnity) return;
 
@@ -313,8 +295,6 @@ public static partial class DL
 
 		if (!Debug.isDebugBuild) return;
 
-		//todo Server
-
 		if (!Settings.ShowInUnity) return;
 
 		string result = message.ToString();
@@ -337,8 +317,6 @@ public static partial class DL
 		}
 
 		if (!Debug.isDebugBuild) return;
-
-		//todo Server
 
 		if (!Settings.ShowInUnity) return;
 
@@ -363,8 +341,6 @@ public static partial class DL
 		}
 
 		if (!Debug.isDebugBuild) return;
-
-		//todo Server
 
 		if (!Settings.ShowInUnity) return;
 
@@ -395,8 +371,6 @@ public static partial class DL
 
 		if (!Debug.isDebugBuild) return;
 
-		//todo Server
-
 		if (!Settings.ShowInUnity) return;
 
 		string result = message.ToString();
@@ -419,8 +393,6 @@ public static partial class DL
 		}
 
 		if (!Debug.isDebugBuild) return;
-
-		//todo Server
 
 		if (!Settings.ShowInUnity) return;
 
@@ -446,8 +418,6 @@ public static partial class DL
 
 		if (!Debug.isDebugBuild) return;
 
-		//todo Server
-
 		if (!Settings.ShowInUnity) return;
 
 		string[] resultArgs = args.Select(arg => arg.ToString()).ToArray();
@@ -471,8 +441,6 @@ public static partial class DL
 
 		if (!Debug.isDebugBuild) return;
 
-		//todo Server
-
 		if (!Settings.ShowInUnity) return;
 
 		Debug.LogException(exception);
@@ -489,8 +457,6 @@ public static partial class DL
 		}
 
 		if (!Debug.isDebugBuild) return;
-
-		//todo Server
 
 		if (!Settings.ShowInUnity) return;
 
