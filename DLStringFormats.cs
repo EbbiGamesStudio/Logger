@@ -85,7 +85,7 @@
 		public const string Cyan = "#00ffffff";
 		public const string White = "#ffffffff";
 		public const string Black = "#000000ff";
-		public const string Magenta = "magenta";
+		public const string Magenta = "#ff00ffff";
 		public const string Blue = "#0000ffff";
 		public const string Gray = "#808080ff";
 		public const string Silver = "#c0c0c0ff";
