@@ -129,6 +129,7 @@ public static partial class DL
 		if (!Settings.Log_ShowInUnity) return;
 
 		string result = message.ToString();
+		//todo stackTrace
 		Debug.Log(result.Colored(defaultColor));
 	}
 
@@ -162,7 +163,7 @@ public static partial class DL
 		string result = $"{channel}: ".Bold();
 		result += message.ToString();
 		result = result.Colored(defaultColor);
-
+		//todo stackTrace
 		Debug.Log(result);
 	}
 
@@ -200,7 +201,7 @@ public static partial class DL
 		string result = $"{channel}: ".Bold();
 		result += string.Format(message.ToString(), resultArgs);
 		result = result.Colored(defaultColor);
-
+		//todo stackTrace
 		Debug.Log(result);
 	}
 

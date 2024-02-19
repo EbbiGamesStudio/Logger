@@ -19,7 +19,6 @@ public static partial class DL
 		Application.logMessageReceived += Application_logMessageReceived;
 		Application.quitting += Application_quitting;
 		logList = new List<string>();
-		timer = new System.Threading.Timer((e) => SaveToFile(), null, 0, 5000);
 	}
 
 	/// <summary>
@@ -308,6 +307,9 @@ public static partial class DL
 
 		filePath = Application.persistentDataPath + $@"\{GetCurrentTimeForFilename()}.log";
 		RemoveExcessLogFiles();
+
+		timer = new System.Threading.Timer((e) => SaveToFile(), null, 0, Settings.SaveTimeInterval * 1000);
+
 	}
 
 	/// <summary>

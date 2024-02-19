@@ -14,6 +14,7 @@
 		// Ustawienia buforowania zapisu
 		public bool IsBuffered { get; set; }
 		public int BufferSize { get; set; }
+		public int SaveTimeInterval { get; set; }
 
 		// Ustawienia główne
 		public bool ShowInUnity { get; set; }
