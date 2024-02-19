@@ -32,7 +32,7 @@ public static partial class DL
 
 	private static Timer timer;
 
-	public const string Version = "v1.1";
+	public const string Version = "v1.2";
 	public const string FullNameApplication = "Debuger (DL) " + Version;
 	private const string separator = "==================================================================================================================";
 	private static List<string> logList;
