@@ -47,11 +47,11 @@ public static partial class DL
 
 	public static DLSettings Settings;
 
-	public const int LogEntryTimeLength = 12;
-	public const int LogEntryTypeLength = 9;
-	public const int LogEntryTitleLength = 30;
-	public const int LogEntrySeparatorLength = 3;
-	public const int LogEntryLeftMargin = LogEntryTimeLength + LogEntryTypeLength + LogEntryTitleLength + (LogEntrySeparatorLength * 2);
+	private const int LogEntryTimeLength = 12;
+	private const int LogEntryTypeLength = 9;
+	private const int LogEntryTitleLength = 30;
+	private const int LogEntrySeparatorLength = 3;
+	private const int LogEntryLeftMargin = LogEntryTimeLength + LogEntryTypeLength + LogEntryTitleLength + (LogEntrySeparatorLength * 2);
 
 	private static int bufferIndex = 0;
 
